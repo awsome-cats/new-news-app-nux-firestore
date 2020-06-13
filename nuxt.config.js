@@ -1,4 +1,4 @@
-
+require('dotenv').config()
 export default {
   mode: 'universal',
   /*
@@ -32,8 +32,19 @@ export default {
   */
   plugins: [
     '@/plugins/firestore.js',
-    '@/plugins/vue-material.js'
+    '@/plugins/vue-material.js',
+    '@/plugins/axios.js'
   ],
+  axios: {
+    credentials: true,
+    proxy: true
+  },
+  proxy: {
+    '/api/': {
+      target: 'https://newsapi.org/v2/',
+      pathRewrite: { '^/api/': '' }
+    }
+  },
   /*
   ** Nuxt.js dev-modules
   */
@@ -45,6 +56,9 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/proxy',
+    '@nuxtjs/dotenv'
   ],
   /*
   ** Build configuration

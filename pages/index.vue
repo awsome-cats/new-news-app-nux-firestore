@@ -1,72 +1,105 @@
 <template>
   <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        nuxt-news-auth-app
-      </h1>
-      <h2 class="subtitle">
-        My first-rate Nuxt.js project
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
+    <div class="md-layout md-alignment-center" style="margin: 4em 0">
+      <md-toolbar class="fixed-toolbar" elevation="1">
+        <md-button class="md-icon-button" @click="showLeftSidePanel=true">
+          <md-icon>menu</md-icon>
+        </md-button>
+        <nuxt-link class="md-primary md-title" to="/">
+          Nuxt News
+        </nuxt-link>
+        <div class="md-toolbar-section-end">
+          <template>
+            <md-button />
+
+            <md-button>ログアウト</md-button>
+          </template>
+          <template>
+            <md-button @click="$router.push('/login')">
+              Login
+            </md-button>
+            <md-button @click="$router.push('/register')">
+              Register
+            </md-button>
+          </template>
+          <md-button
+            class="md-primary"
+          >
+            Search
+          </md-button>
+          <md-button @click="showRightSidePanel=true">
+            Category
+          </md-button>
+        </div>
+      </md-toolbar>
+      <div class="md-layout-item md-size-95">
+        <md-content class="md-layout md-gutter" style="background:#ddd; padding: 1em;">
+          <!-- v-for -->
+          <ul v-for="headline in headlines" :key="headline.id" class="md-layout-item md-large-size-25 md-medium-size-33 md-small-size-50 md-xsmall-size-100">
+            <md-card style="margin-top: 1em;" md-with-hover>
+              <md-ripple>
+                <md-card-media md-ratio="16:9">
+                  <img :src="headline.urlToImage" :alt="headline.title">
+                </md-card-media>
+
+                <md-card-header>
+                  <div class="md-title">
+                    <a :href="headline.url" target="_blank">
+                      {{ headline.title }}
+                    </a>
+                  </div>
+                  <div>
+                    <md-icon class="small-icon">
+                      book
+                    </md-icon>
+                  </div>
+
+                  <div v-if="headline.author" class="md-subhead">
+                    {{ headline.author }}
+                    <md-icon class="small-icon">
+                      face
+                    </md-icon>
+                  </div>
+                  <div class="md-subhead">
+                    {{ headline.publishedAt }}
+                    <md-icon class="small-icon">
+                      alarm
+                    </md-icon>
+                  </div>
+                </md-card-header>
+
+                <md-card-content>{{ headline.description }}</md-card-content>
+                <md-card-actions>
+                  <md-button class="md-icon-button">
+                    <md-icon>bookmark</md-icon>
+                  </md-button>
+                  <md-button>
+                    <md-icon>message</md-icon>
+                  </md-button>
+                </md-card-actions>
+              </md-ripple>
+            </md-card>
+          </ul>
+        </md-content>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-
+import { mapGetters } from 'vuex'
 export default {
-  components: {
-    Logo
+
+  async fetch ({ store }) {
+    await store.dispatch('headlines/loadHeadlines', '/api/top-headlines?country=us')
+  },
+  computed: {
+    ...mapGetters('headlines', ['headlines'])
   }
+
 }
 </script>
 
 <style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
 </style>
