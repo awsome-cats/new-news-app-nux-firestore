@@ -34,9 +34,16 @@
           </md-button>
         </md-card-actions>
       </form>
-      <md-snackbar :md-active.sync="busy">
-        {{ form.email }}でログインしました
-      </md-snackbar>
+      <template v-if="hasError">
+        <md-snackbar :md-activve.sync="hasError">
+          {{error.message}}
+        </md-snackbar>
+      </template>
+      <template v-if="isAuthenticated">
+        <md-snackbar :md-active.sync="isAuthenticated">
+          {{ form.email }}でログインしました
+        </md-snackbar>
+      </template>
     </md-card>
     <md-button
       class="md-fab md-fab-bottom-right md-fixed md-primary"
@@ -51,7 +58,7 @@
 import { validationMixin } from 'vuelidate'
 import { required, email, minLength, maxLength } from 'vuelidate/lib/validators'
 export default {
-  // middleware: 'auth',
+  middleware: 'auth',
   name: 'ProgressBarIndeterminate',
   mixins: [validationMixin],
   data () {
@@ -75,20 +82,33 @@ export default {
       }
     }
   },
+
   computed: {
     loading () {
       return this.$store.getters.loading
     },
     user () {
-      return this.$store.getters.user
+      return this.$store.getters['auth/user']
     },
     busy () {
       return this.$store.getters.busy
     },
     jobDone () {
-      return this.$store.getters.jobDone
+      return this.$store.getters['auth/jobDone']
+    },
+    isAuthenticated () {
+      return this.$store.getters['auth/isAuthenticated']
+    },
+    error () {
+      return this.$store.getters.error
+    },
+    hasError () {
+      if (this.error) {
+        return true
+      }
     }
   },
+
   watch: {
     user (value) {
       if (value) {
@@ -96,6 +116,15 @@ export default {
           this.$router.push('/')
         }, 2000)
       }
+    }
+  },
+  // mounted () {
+  //   console.log('l', this.loading)
+  // },
+  beforeCreate () {
+    const loggedIn = this.$store.getters['auth/user']
+    if (loggedIn) {
+      this.$router.replace('/')
     }
   },
   methods: {
@@ -106,7 +135,7 @@ export default {
       }
     },
     async loginUser () {
-      await this.$store.dispatch('loginUser', {
+        await this.$store.dispatch('auth/loginUser', {
         email: this.form.email,
         password: this.form.password
       })

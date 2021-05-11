@@ -1,9 +1,6 @@
 require('dotenv').config()
 export default {
   mode: 'universal',
-  /*
-  ** Headers of the page
-  */
   head: {
     title: process.env.npm_package_name || '',
     meta: [
@@ -16,57 +13,45 @@ export default {
       { rel: 'stylesheet', href: '//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons' }
     ]
   },
-  /*
-  ** Customize the progress-bar color
-  */
+
   loading: { color: '#9ccc65', height: '3px' },
-  /*
-  ** Global CSS
-  */
+
   css: [
     { src: 'vue-material/dist/vue-material.min.css', lang: 'css' },
     { src: '@/assets/theme.scss', lang: 'scss' }
   ],
-  /*
-  ** Plugins to load before mounting the App
-  */
+
   plugins: [
     '@/plugins/firestore.js',
     '@/plugins/vue-material.js',
-    '@/plugins/axios.js'
+    '@/plugins/axios.js',
+    '@/plugins/date-format'
   ],
   axios: {
     credentials: true,
     proxy: true
   },
+  // https://newsapi.org/v2/top-headlines?country="jp"
   proxy: {
     '/api/': {
       target: 'https://newsapi.org/v2/',
       pathRewrite: { '^/api/': '' }
     }
   },
-  /*
-  ** Nuxt.js dev-modules
-  */
+
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
-    '@nuxtjs/eslint-module'
+    // '@nuxtjs/eslint-module'
   ],
-  /*
-  ** Nuxt.js modules
-  */
+
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/proxy',
     '@nuxtjs/dotenv'
   ],
-  /*
-  ** Build configuration
-  */
+
   build: {
-    /*
-    ** You can extend webpack config here
-    */
+
     extend (config, ctx) {
     }
   }

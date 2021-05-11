@@ -58,13 +58,15 @@
           <md-button @click="$router.push('/login')">
             ログイン
           </md-button>
-          <md-button :disabled="busy" class="md-primary md-raised" type="submit">
+          <md-button :disabled="loading" class="md-primary md-raised" type="submit">
             送信
           </md-button>
         </md-card-actions>
-        <md-snackbar :md-active.sync="error" md-persistent>
-          {{ error }}
-        </md-snackbar>
+        <template v-if="error">
+          <md-snackbar :md-active.sync="error" md-persistent>
+            {{ error.message }}
+          </md-snackbar>
+        </template>
       </form>
 
       <!-- <md-snackbar :md-active.sync="isAuthenticated">
@@ -85,7 +87,7 @@ import { validationMixin } from 'vuelidate'
 import { required, email, minLength, maxLength } from 'vuelidate/lib/validators'
 export default {
   name: 'ProgressBarIndeterminate',
-  // middleware: 'auth',
+  middleware: 'auth',
   mixins: [validationMixin],
   data () {
     return {
@@ -119,7 +121,7 @@ export default {
       return this.$store.getters.loading
     },
     user () {
-      return this.$store.getters.user
+      return this.$store.getters['auth/user']
     },
     error () {
       return this.$store.getters.error
@@ -128,20 +130,20 @@ export default {
       return this.$store.getters.busy
     },
     jobDone () {
-      return this.$store.getters.jobDone
+      return this.$store.getters['auth/jobDone']
     }
   },
-  watch: {
-    jobDone (value) {
-      if (value) {
-        this.$store.commit('setJobDone')
-        setTimeout(() => {
-          this.$router.push('/')
-        }, 2000)
-        this.jobsDone()
-      }
-    }
-  },
+  // watch: {
+  //   jobDone (value) {
+  //     if (value) {
+  //       this.$store.commit('authenticate/auth/setJobDone')
+  //       setTimeout(() => {
+  //         this.$router.push('/')
+  //       }, 2000)
+  //       this.jobsDone()
+  //     }
+  //   }
+  // },
   methods: {
     validateForm () {
       this.$v.$touch()
@@ -150,11 +152,14 @@ export default {
       }
     },
     async registerUser () {
-      await this.$store.dispatch('registerUser', {
+      await this.$store.dispatch('auth/registerUser', {
         email: this.form.email,
         password: this.form.password,
         name: this.form.name
       })
+        .then(() => {
+          this.$router.push('/')
+        })
     },
     getValidationClass (fieldName) {
       const field = this.$v.form[fieldName]
@@ -165,7 +170,7 @@ export default {
       }
     },
     removeErrors () {
-      this.$store.commit('clearError')
+      this.$store.commit('clearError', null)
     },
     jobsDone () {
       this.removeErrors()

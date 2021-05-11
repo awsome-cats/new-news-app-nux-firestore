@@ -13,5 +13,8 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    "no-debugger": 0,
+    "no-console": 0,
+    "prefer-const": 0
   }
 }
